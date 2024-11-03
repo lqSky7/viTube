@@ -7,11 +7,11 @@ dotenv.config();
 const PORT = process.env.PORT;
 
 const isRunning = async () => {
-    const tempe = await db();
-    if (tempe) {
-        console.log("connection established....");
+    const temp = await db();
+    if (temp) {
+        console.log("connection established.... on port", PORT);
         
-    }   // Not using else here since db else case will kill the process.
+    }   // Not using else here since db else case will kill the process, thus never returning false.
 }
 
 isRunning()

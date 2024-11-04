@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+// import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 // note 1: _id is a unique id added to every schema automatically by mongodb.
 const UserSchema = new Schema({
@@ -46,5 +46,5 @@ const UserSchema = new Schema({
 })
 
 
-UserSchema.plugin(mongooseAggregatePaginate)
+// UserSchema.plugin(mongooseAggregatePaginate)
 export const User = mongoose.model("User", UserSchema)

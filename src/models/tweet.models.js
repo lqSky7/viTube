@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+// import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const CommunityPost = new Schema({
     owner:{
@@ -15,5 +15,5 @@ const CommunityPost = new Schema({
     timestamps: true,
 })
 
-CommunityPost.plugin(mongooseAggregatePaginate)
+// CommunityPost.plugin(mongooseAggregatePaginate)
 export  const Tweet = mongoose.model("Tweet", CommunityPost)

@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+// import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 const likeschema = new Schema({
     video:{
         type: mongoose.Types.ObjectId,
@@ -22,5 +22,5 @@ const likeschema = new Schema({
     timestamps: true,
 }) 
 
-likeschema.plugin(mongooseAggregatePaginate)
+// likeschema.plugin(mongooseAggregatePaginate)
 export const Like = mongoose.model("Like", likeschema)

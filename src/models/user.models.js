@@ -1,6 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config({ path: "src/.env" });
 // import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 // note 1: _id is a unique id added to every schema automatically by mongodb.
@@ -61,6 +63,17 @@ UserSchema.methods.isCorrect = async function(newPassSentByUser){
     // we always wait since this can take some time.
 }
 
+
+// generate access token.
+UserSchema.methods.generateAccessToken = async function(){
+    // short lived access token.
+    return jwt.sign({_id: this._id}, process.env.SHORT_LIVED_SECRET, {expiresIn: process.env.DURATION});
+}
+
+UserSchema.methods.generateRefreshToken = async function(){
+    // refresh access token.
+    return jwt.sign({_id: this._id}, process.env.REF_SECRET, {expiresIn: process.env.REF_DURATION});
+}
 
 // UserSchema.plugin(mongooseAggregatePaginate)
 export const User = mongoose.model("User", UserSchema)

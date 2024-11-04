@@ -35,7 +35,7 @@ const VideoSchema = new Schema({
         ref: "User"
     }
 },{
-    timestamps: true
+    timestamps:true
 })
 
-export const Video = mongoose.model("Videos", VideoSchema)
+export const Videos = mongoose.model("Videos", VideoSchema)

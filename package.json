@@ -21,6 +21,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "@types/cors": "^2.8.17",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",

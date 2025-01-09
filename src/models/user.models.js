@@ -10,6 +10,9 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from "bcrypt"
 import mongoose, { Schema } from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config({path: "./env"});
+
 const userSchema= new mongoose.Schema({
     username:{
         type: String,
@@ -66,4 +69,18 @@ userSchema.methods.isPassCrct(async function (password) {
     return await bcrypt.compare(password, this.password);
 })
     
+userSchema.methods.genAccessTokkken(async function(){ //maybe remove async
+    await jwt.sign({
+        _id: userSchema._id,
+        email: userSchema.email,
+        username: userSchema.username
+    }, process.env.ACCESS_TOKEN_PRIV,{expiresIn: process.env.ACCESS_TOKEN_EXP})
+})
+
+userSchema.methods.genRefreshTokkken(async function(){ //maybe remove async
+    await jwt.sign({
+        _id: userSchema._id,
+    }, process.env.REF_TOKEN_PRIV,{expiresIn: process.env.REF_TOKEN_EXP})
+})
+
 export const User = mongoose.model("User", userSchema);

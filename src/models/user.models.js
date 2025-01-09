@@ -7,8 +7,9 @@
 // const schema = new mongoose.Schema({ name: String, size: String });
 // const Tank = mongoose.model('Tank', schema);
 // The first argument is the singular name of the collection your model is for. Mongoose automatically looks for the plural, lowercased version of your model name. Thus, for the example above, the model Tank is for the tanks collection in the database.
-
-import mongoose, { Schema, SchemaType } from 'mongoose';
+import jwt from 'jsonwebtoken';
+import bcrypt from "bcrypt"
+import mongoose, { Schema } from 'mongoose';
 const userSchema= new mongoose.Schema({
     username:{
         type: String,
@@ -53,4 +54,16 @@ const userSchema= new mongoose.Schema({
 
 },{timestamps: true})
 
+// idhar arrow function nhi lgta since it doesnt have access of userSchema by design
+// data save krwane se pehle change karo, others like update, validate, delete etc. also available. do something to data before these actions.
+userSchema.pre("save", async function (next) {
+    if(this.isModified("password")){
+        this.password = await bcrypt.hash("password", 2);
+    }
+    next();
+}) 
+userSchema.methods.isPassCrct(async function (password) {
+    return await bcrypt.compare(password, this.password);
+})
+    
 export const User = mongoose.model("User", userSchema);

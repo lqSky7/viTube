@@ -32,8 +32,11 @@ const registerUser = asyncHandler(async(req,res) => {
         throw new errApi(409, "User/Mail Already Exist!")
     }
 
-    const avatarLocalpath = req.files?.avatar[0]?.path;
-    const coverLocalpath = req.files?.coverimage[0]?.path; // question mark so that it doesnt throw error if path doesnt exist. 
+    if(req.files?.avatar == undefined){
+        throw new errApi(400, "Avatar Image is required")
+    }
+    const avatarLocalpath = req.files.avatar[0].path;
+    const coverLocalpath = req.files?.coverimage?.[0]?.path; // question mark so that it doesnt throw error if path doesnt exist. 
 
     if(!avatarLocalpath){
         throw new errApi(409,"Avatar Image not found on local sever: multer issue or user did not upload properly");

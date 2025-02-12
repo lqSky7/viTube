@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from "bcrypt"
 import mongoose, { Schema } from 'mongoose';
 import dotenv from 'dotenv';
+import { type } from 'node:os';
 dotenv.config({path: "./env"});
 
 const userSchema= new mongoose.Schema({
@@ -49,6 +50,7 @@ const userSchema= new mongoose.Schema({
         }
     ],
     password:{
+        type: String,
         required: [true,'Password is req. bro'],
     },
     refreshToken:{

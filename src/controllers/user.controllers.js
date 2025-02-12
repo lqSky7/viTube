@@ -26,8 +26,8 @@ const registerUser = asyncHandler(async(req,res) => {
     if(username == ""){
         throw errApi(400, "Username is required");
     }
-    const Userexists = await User.findOne(username);
-    const mailexists = await User.findOne(email);
+    const Userexists = await User.findOne({username});
+    const mailexists = await User.findOne({email});
     if(Userexists || mailexists){
         throw new errApi(409, "User/Mail Already Exist!")
     }

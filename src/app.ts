@@ -12,4 +12,10 @@ app.use(express.static("public")) // store temp files in public dir
 app.use(express.urlencoded({ extended: true, limit: "16kb" })) // server can read from url, extened means objects within objects in url
 app.use(cookieparser()) // get cookies from browser into a more readble format
 
+// we import routers here... 
+import userRouter from "./routes/user.routes";
+app.use("/api/v1/users", userRouter);
+
+
+
 export { app };

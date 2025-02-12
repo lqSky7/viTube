@@ -4,9 +4,9 @@ class errApi extends Error {
     data: any;
     success: boolean;
 
-    constructor(statusCode: string, message: string, errors: Array<string>, stack: string){
+    constructor(statusCode: string, message: string | "Something went wrong ", errors: Array<string>, stack: string){
         super(message);
-        this.message = "Something went wrr"
+        this.message = message; 
         this.statusCode = statusCode
         this.data = null
         this.errors = errors

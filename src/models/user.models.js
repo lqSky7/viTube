@@ -67,22 +67,22 @@ userSchema.pre("save", async function (next) {
     }
     next();
 }) 
-userSchema.methods.isPassCrct(async function (password) {
+userSchema.methods.isPassCrct = async function (password) {
     return await bcrypt.compare(password, this.password);
-})
+}
     
-userSchema.methods.genAccessTokkken(async function(){ //maybe remove async
+userSchema.methods.genAccessTokkken= async function(){ //maybe remove async
     await jwt.sign({
         _id: userSchema._id,
         email: userSchema.email,
         username: userSchema.username
     }, process.env.ACCESS_TOKEN_PRIV,{expiresIn: process.env.ACCESS_TOKEN_EXP})
-})
+}
 
-userSchema.methods.genRefreshTokkken(async function(){ //maybe remove async
+userSchema.methods.genRefreshTokkken = async function(){ //maybe remove async
     await jwt.sign({
         _id: userSchema._id,
     }, process.env.REF_TOKEN_PRIV,{expiresIn: process.env.REF_TOKEN_EXP})
-})
+}
 
 export const User = mongoose.model("User", userSchema);

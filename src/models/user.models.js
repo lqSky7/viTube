@@ -36,7 +36,7 @@ const userSchema= new mongoose.Schema({
         lowercase: true,
         trim: true,
     },
-    avtar:{
+    avatar:{
         type: String, // storing as a url
         required: false,
     },

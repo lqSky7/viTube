@@ -13,8 +13,9 @@ import { apiResponse } from "../utils/responseApi";
 // remove password and JWT token from the returned data, give it back to frontend. 
 
 const registerUser = asyncHandler(async(req,res) => {
-    const {Fullname, email, password, username} = req.body;
-    if(Fullname == ""){
+    const {fullname, email, password, username} = req.body;
+    log(req.body);
+    if(fullname == ""){
         throw new errApi(400, "Full name is required");
     }
     if(email == "" || !email.includes("@")){
@@ -50,19 +51,20 @@ const registerUser = asyncHandler(async(req,res) => {
 
     const user = await User.create(
         {
-            Fullname,
+            fullname,
             email,
             password,
             username,
-            avatar: avt.url,
+            avatar: avt || "",
             coverimage: coverImg?.url || ""
         })
-    createdUser = await User.findById(user._id).select("-password -refreshToken") //in select syntax, everything is selected by default, we just removed those 2. and createdUser jab aayega usme in dono ke alawa saare fields select hokr aayenge
+    let createdUser = await User.findById(user._id).select("-password -refreshToken") //in select syntax, everything is selected by default, we just removed those 2. and createdUser jab aayega usme in dono ke alawa saare fields select hokr aayenge
     if(!createdUser){
         throw new errApi(500, "Server side issue: Couldn't register user")
     }
 
-    return res.status(201).json(new apiResponse(200), createdUser, "User reg successful")
+    // Updated response construction with proper apiResponse usage:
+    return res.status(201).json(new apiResponse(200, createdUser, "User reg successful"))
+    log(res.body);
 });
-
 export { registerUser }

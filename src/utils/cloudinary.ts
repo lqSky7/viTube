@@ -14,9 +14,8 @@ const uppToCloudinary = async (localfilepath:string) => {
     try {
         if(!localfilepath){return null;}
         const res = await v2.uploader.upload(localfilepath, {resource_type: "auto"})
-        console.log("file uploaded da, at url: ", res.url);
-        
-        return res;
+        // console.log("file uploaded da, at url: ", res.url); 
+        return res.url;
 
     } catch (error) {
         fs.unlinkSync(localfilepath); //delete local file if not uploaded

@@ -11,7 +11,6 @@ import jwt from 'jsonwebtoken';
 import bcrypt from "bcrypt"
 import mongoose, { Schema } from 'mongoose';
 import dotenv from 'dotenv';
-import { type } from 'node:os';
 dotenv.config({path: "./env"});
 
 const userSchema= new mongoose.Schema({
@@ -63,10 +62,11 @@ const userSchema= new mongoose.Schema({
 // data save krwane se pehle change karo, others like update, validate, delete etc. also available. do something to data before these actions.
 userSchema.pre("save", async function (next) {
     if(this.isModified("password")){
-        this.password = await bcrypt.hash("password", 2);
+        this.password = await bcrypt.hash(this.password, 2);
     }
     next();
 }) 
+
 userSchema.methods.isPassCrct = async function (password) {
     return await bcrypt.compare(password, this.password);
 }

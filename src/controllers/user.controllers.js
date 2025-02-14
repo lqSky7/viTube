@@ -65,6 +65,6 @@ const registerUser = asyncHandler(async(req,res) => {
 
     // Updated response construction with proper apiResponse usage:
     return res.status(201).json(new apiResponse(200, createdUser, "User reg successful"))
-    log(res.body);
+    
 });
 export { registerUser }

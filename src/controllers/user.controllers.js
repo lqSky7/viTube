@@ -58,7 +58,7 @@ const loginUser = asyncHandler(async (req, res) => {
   // send secure cookie back to the user
 
   const { username, email, password } = req.body;
-  if (!username || !email) {
+  if (!(username || email)) {
     throw new errApi(400, "email/username not provided by the frontend");
   }
   const user = await User.findOne({

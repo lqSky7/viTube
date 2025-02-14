@@ -3,7 +3,7 @@ import { errApi } from "../utils/errApi";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.models";
 // we verify if user has correct access refresh token
-export const verifyJWT = asyncHandler(async(req,res, next) => {
+export const verifyJWT = asyncHandler(async(req, _ , next) => {
     try {
         const tokenFromUser = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
         if (!tokenFromUser) {

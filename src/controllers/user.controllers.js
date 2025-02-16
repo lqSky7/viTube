@@ -34,7 +34,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       process.env.REF_TOKEN_PRIV
     ); // this will throw error if incoming token is expired!
 
-    const { acctkn, reftkn } = await genAcc_and_RefToken(decodedReftoken._id);
+    const user = await User.findById(decodedReftoken?._id);
+
+    if (user.refreshToken !== incomingReftkn) {
+      throw new errApi(401, "Refresh token expired!");
+    }
+
+    const { acctkn, reftkn } = await genAcc_and_RefToken(user._id);
 
     return res
       .status(200)
@@ -59,8 +65,8 @@ const genAcc_and_RefToken = async (userID) => {
     const acctkn = user.genAccessToken();
     const reftkn = user.genRefreshToken();
 
-    // user.refreshToken = reftkn;
-    // await user.save({ validateBeforeSave: false }); // we are saving only ref token in user model, but since model has requried fields like pass and username, it wont allow us to save just ref token. this validate before save = false flag.
+    user.refreshToken = reftkn;
+    await user.save({ validateBeforeSave: false }); // we are saving only ref token in user model, but since model has requried fields like pass and username, it wont allow us to save just ref token. this validate before save = false flag.
 
     return { acctkn, reftkn };
   } catch (error) {
@@ -69,12 +75,11 @@ const genAcc_and_RefToken = async (userID) => {
   }
 };
 
-const logoutUser = asyncHandler(async (_, res) => {
+const logoutUser = asyncHandler(async (req, res) => {
   // middleware will verify if user is logged in
   // nuke ref token from db
   // delete all cookies
 
-  /*
   await User.findByIdAndUpdate(
     req.user123._id,
     {
@@ -83,7 +88,7 @@ const logoutUser = asyncHandler(async (_, res) => {
     {
       new: true,
     }
-  ); */
+  );
 
   return res
     .status(200)

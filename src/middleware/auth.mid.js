@@ -14,7 +14,7 @@ export const verifyJWT = asyncHandler(async(req, _ , next) => {
     
         const user = await User.findById(deCodedToken?._id).select("-password -refreshToken")
     
-        if (!user) {throw new errApi(401, "user cookie is wrong!");}
+        if (!user) {throw new errApi(401, "user cookie🍪 is wrong!");}    
     
         req.user123 = user;
         next();

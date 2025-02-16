@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { uppToCloudinary } from "../utils/cloudinary";
 import { apiResponse } from "../utils/responseApi";
 import jwt from "jsonwebtoken";
+import { options } from "../constants";
 import dotenv from "dotenv";
 dotenv.config({ path: "./env" });
 
@@ -19,32 +20,39 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     req.header("Authorization")?.replace("Bearer ", "");
 
   if (!incomingReftkn) {
-    throw new errApi(401, "User did not provide cookies(Reftoken) properly ❌",[],incomingReftkn);
+    throw new errApi(
+      401,
+      "User did not provide cookies(Reftoken) properly ❌",
+      [],
+      incomingReftkn
+    );
   }
 
   try {
-      const decodedReftoken = jwt.verify(incomingReftkn,process.env.REF_TOKEN_PRIV); // this will throw error if incoming token is expired!
-      
+    const decodedReftoken = jwt.verify(
+      incomingReftkn,
+      process.env.REF_TOKEN_PRIV
+    ); // this will throw error if incoming token is expired!
 
     const user = await User.findById(decodedReftoken?._id);
 
     if (user.refreshToken !== incomingReftkn) {
       throw new errApi(401, "Refresh token expired!");
-    } 
+    }
 
-    const options = {
-      httpOnly: true,
-      secure: true,
-    };
-    
     const { acctkn, reftkn } = await genAcc_and_RefToken(user._id);
-    
+
     return res
       .status(200)
       .cookie("accessToken", acctkn, options)
       .cookie("refreshToken", reftkn, options)
       .json(
-        new apiResponse(200, { acctkn, reftkn }, true, "Here's ur new ref/acc tokens!")
+        new apiResponse(
+          200,
+          { acctkn, reftkn },
+          true,
+          "Here's ur new ref/acc tokens!"
+        )
       );
   } catch (err) {
     throw new errApi(500, "server issue: could not update refresh token 🥺");
@@ -56,7 +64,7 @@ const genAcc_and_RefToken = async (userID) => {
     const user = await User.findById(userID);
     const acctkn = user.genAccessToken();
     const reftkn = user.genRefreshToken();
-   
+
     user.refreshToken = reftkn;
     await user.save({ validateBeforeSave: false }); // we are saving only ref token in user model, but since model has requried fields like pass and username, it wont allow us to save just ref token. this validate before save = false flag.
 
@@ -81,11 +89,6 @@ const logoutUser = asyncHandler(async (req, res) => {
       new: true,
     }
   );
-
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
 
   return res
     .status(200)
@@ -125,10 +128,6 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
   return res
     .status(200)
     .cookie("accessToken", acctkn, options)
@@ -212,4 +211,33 @@ const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(new apiResponse(200, createdUser, "User reg successful"));
 });
-export { registerUser, logoutUser, loginUser, refreshAccessToken };
+
+const updatePassword = asyncHandler(async (req, res) => {
+  // we'll be using auth middleware here, so req.user123 is our user extracted from cookies by that middleware.
+  const { newPass, oldPass } = req.body;
+  // match old pass against user
+  // if correct hash and update
+
+  const user = await User.findById(req.user123._id);
+  console.log(user);
+
+  const passreturn = await user.isPassCrct(oldPass);
+  if (!passreturn) {
+    throw new errApi(401, "Wrong password!");
+  }
+  user.password = newPass; // pre hook in  model will automatically hash it!
+  await user.save({ validateBeforeSave: false });
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new apiResponse(200, {}, true, "Password updated Successfully!"));
+});
+
+export {
+  registerUser,
+  logoutUser,
+  loginUser,
+  refreshAccessToken,
+  updatePassword,
+};

@@ -59,8 +59,8 @@ const genAcc_and_RefToken = async (userID) => {
     const acctkn = user.genAccessToken();
     const reftkn = user.genRefreshToken();
 
-    user.refreshToken = reftkn;
-    await user.save({ validateBeforeSave: false }); // we are saving only ref token in user model, but since model has requried fields like pass and username, it wont allow us to save just ref token. this validate before save = false flag.
+    // user.refreshToken = reftkn;
+    // await user.save({ validateBeforeSave: false }); // we are saving only ref token in user model, but since model has requried fields like pass and username, it wont allow us to save just ref token. this validate before save = false flag.
 
     return { acctkn, reftkn };
   } catch (error) {

@@ -34,13 +34,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       process.env.REF_TOKEN_PRIV
     ); // this will throw error if incoming token is expired!
 
-    const user = await User.findById(decodedReftoken?._id);
-
-    if (user.refreshToken !== incomingReftkn) {
-      throw new errApi(401, "Refresh token expired!");
-    }
-
-    const { acctkn, reftkn } = await genAcc_and_RefToken(user._id);
+    const { acctkn, reftkn } = await genAcc_and_RefToken(decodedReftoken._id);
 
     return res
       .status(200)

@@ -69,11 +69,12 @@ const genAcc_and_RefToken = async (userID) => {
   }
 };
 
-const logoutUser = asyncHandler(async (req, res) => {
+const logoutUser = asyncHandler(async (_, res) => {
   // middleware will verify if user is logged in
   // nuke ref token from db
   // delete all cookies
 
+  /*
   await User.findByIdAndUpdate(
     req.user123._id,
     {
@@ -82,7 +83,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     {
       new: true,
     }
-  );
+  ); */
 
   return res
     .status(200)

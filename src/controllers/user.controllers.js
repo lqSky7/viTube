@@ -1,6 +1,5 @@
 import { User } from "../models/user.models";
 import { errApi } from "../utils/errApi";
-import { log } from "node:console";
 import { asyncHandler } from "../utils/asyncHandler";
 import { uppToCloudinary } from "../utils/cloudinary";
 import { apiResponse } from "../utils/responseApi";
@@ -8,6 +7,16 @@ import jwt from "jsonwebtoken";
 import { options } from "../constants";
 import dotenv from "dotenv";
 dotenv.config({ path: "./env" });
+
+const getCurrentUserDetails = asyncHandler(async (req,res) => {
+  try {
+    const user = await User.findById(req.user123._id).select("-refreshToken -password");
+    
+    return res.status(200).json(new apiResponse(200, user, "User details fetched successfully"));
+  
+  } catch (error) {
+    throw new errApi(500, "Server side issue: Couldn't fetch user details");
+  }});
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   // take refresh token from cookies
@@ -150,7 +159,6 @@ const registerUser = asyncHandler(async (req, res) => {
   // DB returns all data when successfully pushed
   // remove password and JWT token from the returned data, give it back to frontend.
   const { fullname, email, password, username } = req.body;
-  log(req.body);
   if (fullname == "") {
     throw new errApi(400, "Full name is required");
   }
@@ -219,7 +227,6 @@ const updatePassword = asyncHandler(async (req, res) => {
   // if correct hash and update
 
   const user = await User.findById(req.user123._id);
-  console.log(user);
 
   const passreturn = await user.isPassCrct(oldPass);
   if (!passreturn) {
@@ -240,4 +247,5 @@ export {
   loginUser,
   refreshAccessToken,
   updatePassword,
+  getCurrentUserDetails
 };

@@ -4,7 +4,40 @@ import { log } from "node:console";
 import { asyncHandler } from "../utils/asyncHandler";
 import { uppToCloudinary } from "../utils/cloudinary";
 import { apiResponse } from "../utils/responseApi";
-import { access } from "node:fs";
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config({path: "./env"});
+
+const refreshAccessToken = asyncHandler(async(req,res) => {
+    // take refresh token from cookies
+    // decode it and verifiy against ref token in db
+    // if true assign gen + save new accesstoken in db
+    // return that acc and current ref token back to user
+    const incomingReftkn = req.body?.refreshToken || req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+
+    if(!(incomingReftkn)) {
+        throw new errApi(401, "User did not provide cookies(Reftoken) properly ❌");
+    }
+
+    try {
+        const decodedReftoken = jwt.verify(incomingReftkn, process.env.REF_TOKEN_PRIV);
+        const user = await User.findById(decodedReftoken?._id);
+        if(user.refreshToken !== decodedReftoken) {
+          throw new errApi(401,"Refresh token expired!")
+        }
+
+        const options = {
+          httpOnly: true,
+          secure: true
+        }
+
+        const {ac, rc} = await genAcc_and_RefToken(user._id);
+        return res.status(200).cookie("accessToken", ac).cookie("refreshToken", rc).json(new apiResponse(200, {ac,rc}, true,"Here's ur new ref/acc tokens!"))
+
+    } catch (err) {
+        throw new errApi(500, "server issue: could not update refresh token 🥺")
+    }
+})
 
 const genAcc_and_RefToken = async (userID) => {
   try {
@@ -43,7 +76,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   };
 
   return res.status(200).clearCookie("accessToken").clearCookie("refreshToken")
-  .json(new apiResponse(200, {}, "user logged out...."))
+  .json(new apiResponse(200, {}, "user logged out.... 😶"))
 
 }
 
@@ -167,4 +200,4 @@ const registerUser = asyncHandler(async (req, res) => {
     .status(201)
     .json(new apiResponse(200, createdUser, "User reg successful"));
 });
-export { registerUser, logoutUser, loginUser };
+export { registerUser, logoutUser, loginUser, refreshAccessToken };

@@ -8,45 +8,65 @@ import { options } from "../constants";
 import dotenv from "dotenv";
 dotenv.config({ path: "./env" });
 
-const getCurrentUserDetails = asyncHandler(async (req,res) => {
+const getCurrentUserDetails = asyncHandler(async (req, res) => {
   try {
-    const user = await User.findById(req.user123._id).select("-refreshToken -password");
-    
-    return res.status(200).json(new apiResponse(200, user, "User details fetched successfully"));
-  
+    const user = await User.findById(req.user123._id).select(
+      "-refreshToken -password"
+    );
+
+    return res
+      .status(200)
+      .json(new apiResponse(200, user, "User details fetched successfully"));
   } catch (error) {
     throw new errApi(500, "Server side issue: Couldn't fetch user details");
-  }});
-
-const updateUserDetails = asyncHandler(async (req,res) => {
-  try {
-   const {fullname, email} = req.body;
-    if(!fullname || !email){
-      throw new errApi(400, "User data empty", [], "User data empty");
-    }
-    const user = await User.findByIdAndUpdate(req.user123._id, {$set: {fullname: fullname, email: email}}, {new: true}).select("-password -refreshToken")
-    return res.status(200).json(new apiResponse(200, user, true, "User with updated data: "))
-  } catch (error) {
-    throw new errApi(500, "Server side issue: Couldn't update user details", [], error);
   }
 });
 
-const updateUserAvatar = asyncHandler(async (req,res) => {
+const updateUserDetails = asyncHandler(async (req, res) => {
+  try {
+    const { fullname, email } = req.body;
+    if (!fullname || !email) {
+      throw new errApi(400, "User data empty", [], "User data empty");
+    }
+    const user = await User.findByIdAndUpdate(
+      req.user123._id,
+      { $set: { fullname: fullname, email: email } },
+      { new: true }
+    ).select("-password -refreshToken");
+    return res
+      .status(200)
+      .json(new apiResponse(200, user, true, "User with updated data: "));
+  } catch (error) {
+    throw new errApi(
+      500,
+      "Server side issue: Couldn't update user details",
+      [],
+      error
+    );
+  }
+});
+
+const updateUserAvatar = asyncHandler(async (req, res) => {
   if (req.files?.avatar == undefined) {
     throw new errApi(400, "Avatar Image is required");
   }
   const avatarLocalpath = req.files.avatar[0].path;
-  
+
   try {
     const avt = await uppToCloudinary(avatarLocalpath);
-    const user = await User.findByIdAndUpdate(req.user123?._id,{$set: {avatar: avt}},{new: true}).select("-password -refreshToken")
-    console.log(user);
-    
-    return res.status(200).json(new apiResponse(200, user, true,"User with updated avatar"))
+    const user = await User.findByIdAndUpdate(
+      req.user123?._id,
+      { $set: { avatar: avt } },
+      { new: true }
+    ).select("-password -refreshToken");
+    // todo delete old avatar from cloudinary
+    return res
+      .status(200)
+      .json(new apiResponse(200, user, true, "User with updated avatar"));
   } catch (error) {
-    throw new errApi(400, "error while uploading avatar to cloudinary")
+    throw new errApi(400, "error while uploading avatar to cloudinary");
   }
-})
+});
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   // take refresh token from cookies
@@ -271,6 +291,63 @@ const updatePassword = asyncHandler(async (req, res) => {
     .json(new apiResponse(200, {}, true, "Password updated Successfully!"));
 });
 
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+  if (!username.trim()) {
+    throw new errApi(400, "Username missing");
+  }
+
+  const channel = await User.aggregate([
+    {
+      $match: { username: username?.toLowerCase() },
+    },
+    {
+      // from matlab kis model se dekhna hai.
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers",
+      }, //model name is Subscription but mongo stores as lowercase + plural
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo",
+      },
+    },
+    {
+      $addFields: {
+        subscribersCount: { $size: "$subscribers" },
+        subscribedTo: { $size: "$subscribedTo" },
+        isSubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        fullname: 1,
+        username: 1,
+        subscribedTo: 1,
+        avatar: 1,
+        subscribers: 1,
+      }
+    }
+  ]);
+  if(!channel?.length){
+    throw new errApi(404, "channel does not exist")
+  }
+  return res.status(200).json(new apiResponse(200, channel[0], "user channel fetched successfully"))
+
+});
+
 export {
   registerUser,
   logoutUser,
@@ -279,5 +356,6 @@ export {
   updatePassword,
   getCurrentUserDetails,
   updateUserDetails,
-  updateUserAvatar
+  updateUserAvatar,
+  getUserChannelProfile
 };

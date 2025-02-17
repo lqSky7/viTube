@@ -24,5 +24,11 @@ const uppToCloudinary = async (localfilepath:string) => {
     }
 }
 
-
+// const delFromCloudinary = async(cloudiURL) => {
+//     try {
+//         // TODO1: make the entire cloudinary storing thing more secure and add support to delete which is currently impossible because we just store links in user model.
+//     } catch (e) {
+//         throw new Error("File doesnt exist on Cloudinary server");
+//     }
+// }
 export {uppToCloudinary};

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getCurrentUserDetails, loginUser, logoutUser, refreshAccessToken, registerUser, updatePassword, updateUserAvatar, updateUserDetails } from "../controllers/user.controllers";
+import { getCurrentUserDetails, getUserChannelProfile, loginUser, logoutUser, refreshAccessToken, registerUser, updatePassword, updateUserAvatar, updateUserDetails } from "../controllers/user.controllers";
 import { upload } from '../middleware/multer.mid';
 import { verifyJWT } from "../middleware/auth.mid";
 const userRouter = Router();
@@ -7,6 +7,7 @@ const userRouter = Router();
 userRouter.route("/register").post(upload.fields([{"name" : "avatar", maxCount : 1}, {"name" : "coverimage", maxCount : 1}]) , registerUser)
 userRouter.route("/refreshCookie").post(refreshAccessToken)
 userRouter.route("/login").post(loginUser)
+userRouter.route("/:username").get(getUserChannelProfile)
 
 // secured routes (only when user logged in):
 userRouter.route("/logout").post(verifyJWT, logoutUser)

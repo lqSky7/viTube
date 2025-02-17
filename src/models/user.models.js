@@ -12,11 +12,11 @@ import bcrypt from "bcrypt"
 import mongoose, { Schema } from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config({path: "./env"});
-
+// TODO1: cloudinary delete support: add support to store cloudinary public_id for deletion support
 const userSchema= new mongoose.Schema({
     username:{
         type: String,
-        required: true,
+        required: true, 
         lowercase: true,
         trim: true,
         unique: true,

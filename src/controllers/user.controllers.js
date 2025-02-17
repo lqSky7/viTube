@@ -18,6 +18,36 @@ const getCurrentUserDetails = asyncHandler(async (req,res) => {
     throw new errApi(500, "Server side issue: Couldn't fetch user details");
   }});
 
+const updateUserDetails = asyncHandler(async (req,res) => {
+  try {
+   const {fullname, email} = req.body;
+    if(!fullname || !email){
+      throw new errApi(400, "User data empty", [], "User data empty");
+    }
+    const user = await User.findByIdAndUpdate(req.user123._id, {$set: {fullname: fullname, email: email}}, {new: true}).select("-password -refreshToken")
+    return res.status(200).json(new apiResponse(200, user, true, "User with updated data: "))
+  } catch (error) {
+    throw new errApi(500, "Server side issue: Couldn't update user details", [], error);
+  }
+});
+
+const updateUserAvatar = asyncHandler(async (req,res) => {
+  if (req.files?.avatar == undefined) {
+    throw new errApi(400, "Avatar Image is required");
+  }
+  const avatarLocalpath = req.files.avatar[0].path;
+  
+  try {
+    const avt = await uppToCloudinary(avatarLocalpath);
+    const user = await User.findByIdAndUpdate(req.user123?._id,{$set: {avatar: avt}},{new: true}).select("-password -refreshToken")
+    console.log(user);
+    
+    return res.status(200).json(new apiResponse(200, user, true,"User with updated avatar"))
+  } catch (error) {
+    throw new errApi(400, "error while uploading avatar to cloudinary")
+  }
+})
+
 const refreshAccessToken = asyncHandler(async (req, res) => {
   // take refresh token from cookies
   // decode it and verifiy against ref token in db
@@ -247,5 +277,7 @@ export {
   loginUser,
   refreshAccessToken,
   updatePassword,
-  getCurrentUserDetails
+  getCurrentUserDetails,
+  updateUserDetails,
+  updateUserAvatar
 };

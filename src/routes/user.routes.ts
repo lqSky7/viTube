@@ -7,9 +7,9 @@ const userRouter = Router();
 userRouter.route("/register").post(upload.fields([{"name" : "avatar", maxCount : 1}, {"name" : "coverimage", maxCount : 1}]) , registerUser)
 userRouter.route("/refreshCookie").post(refreshAccessToken)
 userRouter.route("/login").post(loginUser)
-userRouter.route("/:username").get(getUserChannelProfile)
 
 // secured routes (only when user logged in):
+userRouter.route("/:username").get(verifyJWT,getUserChannelProfile)
 userRouter.route("/logout").post(verifyJWT, logoutUser)
 userRouter.route("/update/password").post(verifyJWT, updatePassword)
 userRouter.route("/update/data").post(verifyJWT, updateUserDetails)

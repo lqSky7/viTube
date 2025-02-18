@@ -1,0 +1,5 @@
+- [ ] Add Cloudinary file deletion support
+- [ ] Migrate from Multer to client-side upload
+  - Generate signed URLs for direct-to-cloud uploads
+  - Implement pre-signed URL generation endpoint
+  - Add client-side upload handling

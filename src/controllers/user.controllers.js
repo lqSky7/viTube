@@ -1,4 +1,5 @@
 import { User } from "../models/user.models";
+import { Subscription } from "../models/subscriber.models";
 import { errApi } from "../utils/errApi";
 import { asyncHandler } from "../utils/asyncHandler";
 import { uppToCloudinary } from "../utils/cloudinary";
@@ -7,6 +8,21 @@ import jwt from "jsonwebtoken";
 import { options } from "../constants";
 import dotenv from "dotenv";
 dotenv.config({ path: "./env" });
+
+const createSubscription = asyncHandler(async (req,res) => {
+  const { channel } = req.body; // channel = subscribed to
+  if(!channel) {
+    throw new errApi(401, "User did not provide channel to subscribe to", error)
+  }
+  try {
+    const subscriber = req.user123._id;
+    let subs = await Subscription.create({ subscriber, channel });
+    return res.status(201).json(new apiResponse(200, subs, true, "new subscription document created successfully"))
+  } catch (error) {
+    throw new errApi(500, "Server side issue: couldn't create subscription model", error)
+  }
+
+});
 
 const getCurrentUserDetails = asyncHandler(async (req, res) => {
   try {
@@ -357,5 +373,6 @@ export {
   getCurrentUserDetails,
   updateUserDetails,
   updateUserAvatar,
-  getUserChannelProfile
+  getUserChannelProfile,
+  createSubscription
 };

@@ -14,7 +14,9 @@ app.use(cookieparser()) // get cookies from browser into a more readble format
 
 // we import routers here... 
 import userRouter from "./routes/user.routes";
+import  subRouter  from "./routes/subscription.routes";
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/subscribe", subRouter);
 
 
 

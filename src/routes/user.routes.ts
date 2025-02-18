@@ -8,12 +8,12 @@ userRouter.route("/register").post(upload.fields([{"name" : "avatar", maxCount :
 userRouter.route("/refreshCookie").post(refreshAccessToken)
 userRouter.route("/login").post(loginUser)
 
-// secured routes (only when user logged in):
-userRouter.route("/:username").get(verifyJWT,getUserChannelProfile)
+// (Secured Routes 🔐)
+userRouter.route("/get/:username").get(verifyJWT,getUserChannelProfile)
 userRouter.route("/logout").post(verifyJWT, logoutUser)
 userRouter.route("/update/password").post(verifyJWT, updatePassword)
 userRouter.route("/update/data").post(verifyJWT, updateUserDetails)
-userRouter.route("/getme").get(verifyJWT, getCurrentUserDetails)
+userRouter.route("/me").get(verifyJWT, getCurrentUserDetails)
 userRouter.route("/update/avatar").post(upload.fields([{"name": "avatar", maxCount: 1}]), verifyJWT, updateUserAvatar)
 
 export default userRouter

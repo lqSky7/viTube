@@ -7,21 +7,38 @@ import { apiResponse } from "../utils/responseApi";
 import jwt from "jsonwebtoken";
 import { options } from "../constants";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 dotenv.config({ path: "./env" });
 
-const createSubscription = asyncHandler(async (req,res) => {
+const createSubscription = asyncHandler(async (req, res) => {
   const { channel } = req.body; // channel = subscribed to
-  if(!channel) {
-    throw new errApi(401, "User did not provide channel to subscribe to", error)
+  if (!channel) {
+    throw new errApi(
+      401,
+      "User did not provide channel to subscribe to",
+      error
+    );
   }
   try {
     const subscriber = req.user123._id;
     let subs = await Subscription.create({ subscriber, channel });
-    return res.status(201).json(new apiResponse(200, subs, true, "new subscription document created successfully"))
+    return res
+      .status(201)
+      .json(
+        new apiResponse(
+          200,
+          subs,
+          true,
+          "new subscription document created successfully"
+        )
+      );
   } catch (error) {
-    throw new errApi(500, "Server side issue: couldn't create subscription model", error)
+    throw new errApi(
+      500,
+      "Server side issue: couldn't create subscription model",
+      error
+    );
   }
-
 });
 
 const getCurrentUserDetails = asyncHandler(async (req, res) => {
@@ -354,14 +371,70 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         subscribedTo: 1,
         avatar: 1,
         subscribers: 1,
-      }
-    }
+      },
+    },
   ]);
-  if(!channel?.length){
-    throw new errApi(404, "channel does not exist")
+  if (!channel?.length) {
+    throw new errApi(404, "channel does not exist");
   }
-  return res.status(200).json(new apiResponse(200, channel[0], "user channel fetched successfully"))
+  return res
+    .status(200)
+    .json(
+      new apiResponse(200, channel[0], "user channel fetched successfully")
+    );
+});
 
+const getWatchHistory = asyncHandler(async (req, res) => {
+  const user = await User.aggregate([
+    {
+      // $match: {_id: req.user123._id} wrong as req123._id returns a string , it was mongoose that converted that string to object to query db in above cases, but mongoose doesnt do that in aggregate
+      $match: { _id: new mongoose.Types.ObjectId(req.user123._id) },
+    },
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "watchHistory",
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                {
+                  $project: {
+                    fullname: 1,
+                    username: 1,
+                    avatar: 1,
+                  },
+                },
+              ],
+              pipeline: [
+                {
+                  $addFields: {
+                    owner: { $first: "$owner" },
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ]);
+  return res
+    .status(200)
+    .json(
+      new apiResponse(
+        200,
+        user[0].watchHistory,
+        true,
+        "Watch history fetched successfully!"
+      )
+    );
 });
 
 export {
@@ -374,5 +447,6 @@ export {
   updateUserDetails,
   updateUserAvatar,
   getUserChannelProfile,
-  createSubscription
+  createSubscription,
+  getWatchHistory,
 };

@@ -1,10 +1,10 @@
 class errApi extends Error {
-    statusCode: string;
+    statusCode: Number;
     errors: Array<string>;
     data: any;
     success: boolean;
 
-    constructor(statusCode: string, message: string | "Something went wrong ", errors: Array<string>, stack: string){
+    constructor(statusCode: Number, message: string | "Something went wrong ", errors: Array<string>, stack: string){
         super(message);
         this.message = message; 
         this.statusCode = statusCode

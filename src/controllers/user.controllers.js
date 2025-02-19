@@ -10,37 +10,6 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 dotenv.config({ path: "./env" });
 
-const createSubscription = asyncHandler(async (req, res) => {
-  const { channel } = req.body; // channel = subscribed to
-  if (!channel) {
-    throw new errApi(
-      401,
-      "User did not provide channel to subscribe to",
-      error
-    );
-  }
-  try {
-    const subscriber = req.user123._id;
-    let subs = await Subscription.create({ subscriber, channel });
-    return res
-      .status(201)
-      .json(
-        new apiResponse(
-          200,
-          subs,
-          true,
-          "new subscription document created successfully"
-        )
-      );
-  } catch (error) {
-    throw new errApi(
-      500,
-      "Server side issue: couldn't create subscription model",
-      error
-    );
-  }
-});
-
 const getCurrentUserDetails = asyncHandler(async (req, res) => {
   try {
     const user = await User.findById(req.user123._id).select(
@@ -450,6 +419,5 @@ export {
   updateUserDetails,
   updateUserAvatar,
   getUserChannelProfile,
-  createSubscription,
   getWatchHistory,
 };

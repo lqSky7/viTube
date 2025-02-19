@@ -61,4 +61,27 @@ const toggleSubscription = asyncHandler(async (req, res) => {
   }
 });
 
-export { toggleSubscription };
+const getUserChannelSubscribers = asyncHandler(async (req, res) => {
+  const { channel } = req.params;  // user here refers to channel's username
+  if (!channel) {
+    throw new errApi(401, "channel not provided");
+  }
+  try {
+    const user = await User.findOne({ username : channel })
+    const subscribers = await Subscription.countDocuments({ channel: user._id });
+    return res
+      .status(201)
+      .json(
+        new apiResponse(
+          200,
+          {subscribers},
+          true,
+          "subscribers fetched successfully"
+        )
+      );
+  } catch (error) {
+    throw new errApi(500, "Server side issue: couldn't fetch subscribers", error);
+  }
+});
+
+export { toggleSubscription, getUserChannelSubscribers };

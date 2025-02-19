@@ -3,8 +3,6 @@ import { Subscription } from "../models/subscriber.models";
 import { errApi } from "../utils/errApi";
 import { asyncHandler } from "../utils/asyncHandler";
 import { apiResponse } from "../utils/responseApi";
-import dotenv from "dotenv";
-dotenv.config({ path: "./env" });
 
 const toggleSubscription = asyncHandler(async (req, res) => {
 

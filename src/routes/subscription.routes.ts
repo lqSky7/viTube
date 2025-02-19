@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { verifyJWT } from "../middleware/auth.mid";
-import { createSubscription } from "../controllers/user.controllers"; 
+import { toggleSubscription } from "../controllers/subscription.controller"; 
 const subRouter = Router();
 
 // (Secured Routes 🔐)
-subRouter.route("/").post(verifyJWT, createSubscription)
+subRouter.route("/").post(verifyJWT, toggleSubscription)
 export default subRouter

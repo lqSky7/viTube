@@ -3,3 +3,5 @@
   - Generate signed URLs for direct-to-cloud uploads
   - Implement pre-signed URL generation endpoint
   - Add client-side upload handling
+
+- https://www.reddit.com/r/microservices/comments/8vknrv/comment/e1o9e2c/ 

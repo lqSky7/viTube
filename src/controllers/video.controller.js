@@ -39,4 +39,22 @@ const uploadVideo = asyncHandler(async (req, res) => {
     }
 });
 
-export { uploadVideo }
+const deleteVideo = asyncHandler(async(req, res) => {
+  const {videoId} = req.body;
+  const owner = req.user123._id;
+  if(!videoId) {
+    throw new errApi(401, "Video Id not provided", [], "")
+  }
+  try {
+    const delResponse = await Video.findOneAndDelete(
+      {
+        $and: [{owner}, {_id:videoId}]
+      }
+    )
+    return res.status(200).json(new apiResponse(201, {delResponse}, true, "Video found and deleted successfully..."))
+  } catch (error) {
+    throw new errApi(403, "Video does not exist or server issue", [], "")
+  }
+})
+
+export { uploadVideo, deleteVideo }

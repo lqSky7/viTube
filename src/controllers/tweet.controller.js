@@ -22,8 +22,13 @@ const createTweet = asyncHandler(async(req, res) => {
 })
 
 const getUserTweets = asyncHandler(async(req,res) => {
-    const user = req.params;
-    // const tweet = 
+    const {username} = req.params;
+    try {
+        const tweet = await Tweet.find({username})
+        return res.status(200).json(new apiResponse(201, {tweet}, true, "user tweets fetched"))
+    } catch (error) {
+        throw new errApi(401, "Given user does not have any tweets" + error, error, "")
+    }
 })
 
-export { createTweet }
+export { createTweet , getUserTweets }

@@ -6,19 +6,24 @@ import { apiResponse } from "../utils/responseApi";
 
 const createTweet = asyncHandler(async(req, res) => {
     const owner = req.user123._id;
+    const username = req.user123.username;
     const {content} = req.body;
     if(content == undefined){
         throw new errApi(401, "Tweet content not provided")
     }
 
     try {
-        const tweet = await Tweet.create({content, owner});
+        const tweet = await Tweet.create({content, owner, username});
         return res.status(200).json(new apiResponse(201, tweet, true, "Tweet created successfully"))
     } catch (error) {
-        throw new errApi(500, "failed to create tweet")
+        throw new Error(error)
     }
 
 })
 
+const getUserTweets = asyncHandler(async(req,res) => {
+    const user = req.params;
+    // const tweet = 
+})
 
 export { createTweet }

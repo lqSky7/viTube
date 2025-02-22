@@ -6,10 +6,8 @@ import { User } from "../models/user.models";
 
 interface JwtPayload {
   _id: string;
-  // Add other JWT payload properties if needed
 }
 
-// Extend Express Request type to include user property
 declare global {
   namespace Express {
     interface Request {
@@ -37,7 +35,7 @@ export const verifyJWT = asyncHandler(
       const user = await User.findById(deCodedToken?._id).select(
         "-password -refreshToken"
       );
-
+      
       if (!user) {
         throw new errApi(401, "user cookie🍪 is wrong!", [], "");
       }

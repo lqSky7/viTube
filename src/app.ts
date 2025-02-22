@@ -16,11 +16,13 @@ app.use(cookieparser()) // get cookies from browser into a more readble format
 import userRouter from "./routes/user.routes";
 import  subRouter  from "./routes/subscription.routes";
 import vidRouter  from "./routes/video.routes";
+import tweetRouter from "./routes/tweet.routes";
 
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/subscribe", subRouter);
 app.use("/api/v1/video", vidRouter)
+app.use("/api/v1/tweet", tweetRouter)
 
 
 

@@ -88,7 +88,7 @@ const getSubscribedChannels = asyncHandler(async (req,res) => {
     const allSubscribedChannels = await Subscription.find({subscriber: user})
     return res.status(201).json(new apiResponse(201, allSubscribedChannels, true, "successful"))
   } catch (error) {
-    throw new errApi(500, "Something went wrong while fetching all subscribed channels", [], "")
+    throw new errApi(500, "Something went wrong while fetching all subscribed channels", error, "")
   }
 })
 

@@ -20,7 +20,7 @@ const getCurrentUserDetails = asyncHandler(async (req, res) => {
       .status(200)
       .json(new apiResponse(200, user, "User details fetched successfully"));
   } catch (error) {
-    throw new errApi(500, "Server side issue: Couldn't fetch user details");
+    throw new errApi(500, "Server side issue: Couldn't fetch user details", error, "");
   }
 });
 
@@ -28,7 +28,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
   try {
     const { fullname, email } = req.body;
     if (!fullname || !email) {
-      throw new errApi(400, "User data empty", [], "User data empty");
+      throw new errApi(400, "User data empty", "" , "");
     }
     const user = await User.findByIdAndUpdate(
       req.authorizedUser._id,
@@ -42,15 +42,15 @@ const updateUserDetails = asyncHandler(async (req, res) => {
     throw new errApi(
       500,
       "Server side issue: Couldn't update user details",
-      [],
-      error
+      error,
+      ""
     );
   }
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
   if (req.files?.avatar == undefined) {
-    throw new errApi(400, "Avatar Image is required");
+    throw new errApi(400, "Avatar Image is required","","");
   }
   const avatarLocalpath = req.files.avatar[0].path;
 
@@ -66,7 +66,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
       .status(200)
       .json(new apiResponse(200, user, true, "User with updated avatar"));
   } catch (error) {
-    throw new errApi(400, "error while uploading avatar to cloudinary");
+    throw new errApi(400, "error while uploading avatar to cloudinary",error,"");
   }
 });
 
@@ -84,8 +84,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     throw new errApi(
       401,
       "User did not provide cookies(Reftoken) properly ❌",
-      [],
-      incomingReftkn
+      "error",
+      ""
     );
   }
 
@@ -98,7 +98,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const user = await User.findById(decodedReftoken?._id);
 
     if (user.refreshToken !== incomingReftkn) {
-      throw new errApi(401, "Refresh token expired!");
+      throw new errApi(401, "Refresh token expired!", "","");
     }
 
     const { acctkn, reftkn } = await genAcc_and_RefToken(user._id);
@@ -116,7 +116,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         )
       );
   } catch (err) {
-    throw new errApi(500, "server issue: could not update refresh token 🥺");
+    throw new errApi(500, "server issue: could not update refresh token 🥺", err,"");
   }
 });
 
@@ -131,8 +131,7 @@ const genAcc_and_RefToken = async (userID) => {
 
     return { acctkn, reftkn };
   } catch (error) {
-    log(error);
-    throw new errApi(500, "server issue: could not generate ref/acc tokens 😭");
+    throw new errApi(500, "server issue: could not generate ref/acc tokens 😭",error,"");
   }
 };
 

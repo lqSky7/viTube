@@ -24,7 +24,7 @@ export const verifyJWT = asyncHandler(
         req.header("Authorization")?.replace("Bearer ", "");
 
       if (!tokenFromUser) {
-        throw new errApi(401, "no cookies passed from user", [], "");
+        throw new errApi(401, "no cookies passed from user", "", "");
       }
 
       const deCodedToken = jwt.verify(
@@ -37,13 +37,13 @@ export const verifyJWT = asyncHandler(
       );
 
       if (!user) {
-        throw new errApi(401, "user cookie🍪 is wrong!", [], "");
+        throw new errApi(401, "user cookie🍪 is wrong!", "", "");
       }
 
       req.authorizedUser = user;
       next();
     } catch (error) {
-      throw new errApi(401, "Something went wrong", [], "");
+      throw new errApi(401, "Something went wrong", "error" , "");
     }
   }
 );

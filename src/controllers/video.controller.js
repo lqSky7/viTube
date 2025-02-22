@@ -44,7 +44,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
   } catch (error) {
     throw new errApi(
       500,
-      "Something went wrong while uploading video: " + error.message
+      "Something went wrong while uploading video: " , error, ""
     );
   }
 });
@@ -53,7 +53,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.body;
   const owner = req.authorizedUser._id;
   if (!videoId) {
-    throw new errApi(401, "Video Id not provided", [], "");
+    throw new errApi(401, "Video Id not provided", "", "");
   }
   try {
     const delResponse = await Video.findOneAndDelete({
@@ -70,14 +70,14 @@ const deleteVideo = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new errApi(403, "Video does not exist or server issue", [], "");
+    throw new errApi(403, "Video does not exist or server issue", error, "");
   }
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   if (!videoId) {
-    throw new errApi(401, "Video Id not provided", [], "");
+    throw new errApi(401, "Video Id not provided", "", "");
   }
   try {
     const getVideoResponse = await Video.findByIdAndUpdate(
@@ -96,7 +96,7 @@ const getVideoById = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new errApi(401, "Video does not exist on server", [], "");
+    throw new errApi(401, "Video does not exist on server", error, "");
   }
 });
 
@@ -105,7 +105,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
   const owner = req.authorizedUser._id;
   
   if (!videoId) {
-    throw new errApi(401, "Video Id not provided", [], "");
+    throw new errApi(401, "Video Id not provided", "", "");
   }
   try {
     const toggleRes = await Video.findOneAndUpdate(
@@ -127,7 +127,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new errApi(403, "Video does not exist or server issue", [], "");
+    throw new errApi(403, "Video does not exist or server issue", error, "");
   }
 });
 

@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { createcomment , updatecomment, deletecomment, getVideocomments} from "../controllers/comment.controller";
-import { upload } from '../middleware/multer.mid';
 import { verifyJWT } from "../middleware/auth.mid";
 const commentRouter = Router();
 

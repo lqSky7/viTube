@@ -1,9 +1,9 @@
+import { User } from "../models/user.models";
 import { Video } from "../models/video.models";
 import { errApi } from "../utils/errApi";
 import { asyncHandler } from "../utils/asyncHandler";
 import { apiResponse } from "../utils/responseApi";
 import { uppToCloudinary } from "../utils/cloudinary";
-import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const uploadVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
@@ -28,7 +28,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
       description,
       videoFile: videoUploadResponse.url,
       duration: videoUploadResponse.duration || 0,
-      owner: req.authorizedUser._id,
+      owner: req.user123._id,
     });
 
     return res
@@ -44,16 +44,16 @@ const uploadVideo = asyncHandler(async (req, res) => {
   } catch (error) {
     throw new errApi(
       500,
-      "Something went wrong while uploading video: " , error, ""
+      "Something went wrong while uploading video: " + error.message
     );
   }
 });
 
 const deleteVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.body;
-  const owner = req.authorizedUser._id;
+  const owner = req.user123._id;
   if (!videoId) {
-    throw new errApi(401, "Video Id not provided", "", "");
+    throw new errApi(401, "Video Id not provided", [], "");
   }
   try {
     const delResponse = await Video.findOneAndDelete({
@@ -70,14 +70,14 @@ const deleteVideo = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new errApi(403, "Video does not exist or server issue", error, "");
+    throw new errApi(403, "Video does not exist or server issue", [], "");
   }
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   if (!videoId) {
-    throw new errApi(401, "Video Id not provided", "", "");
+    throw new errApi(401, "Video Id not provided", [], "");
   }
   try {
     const getVideoResponse = await Video.findByIdAndUpdate(
@@ -96,16 +96,16 @@ const getVideoById = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new errApi(401, "Video does not exist on server", error, "");
+    throw new errApi(401, "Video does not exist on server", [], "");
   }
 });
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
   const { videoId } = req.body;
-  const owner = req.authorizedUser._id;
+  const owner = req.user123._id;
   
   if (!videoId) {
-    throw new errApi(401, "Video Id not provided", "", "");
+    throw new errApi(401, "Video Id not provided", [], "");
   }
   try {
     const toggleRes = await Video.findOneAndUpdate(
@@ -127,34 +127,12 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    throw new errApi(403, "Video does not exist or server issue", error, "");
+    throw new errApi(403, "Video does not exist or server issue", [], "");
   }
 });
 
-const getUserFeed = asyncHandler(async (req, res) => {
-  const { page, query, sortBy, sortType, userId } = req.query
-
-// create an aggregate query: without await (https://stackoverflow.com/questions/77414445/mongoose-aggregate-pagination-v2-aggregatepagination-isnt-working-properly)
-// then use aggregate paginate with await. 
-const matchStage = {isPublished: true}  // generate feed only from published videos!
-if(userId){matchStage._id = userId}
-if(query){matchStage.title = {$search : query}}
-
-const aggregateQuery = Video.aggregate([{$match: matchStage}]);
-
-  const paginateOptions = {
-    page: parseInt(page) || 1,
-    limit: 2,
-    sort: { [sortBy || "createdAt"]: sortType === "asc" ? 1 : -1 }
-  }
-
-try {
-  const result = await Video.aggregatePaginate(aggregateQuery,paginateOptions);
-  return res.status(200).json(new apiResponse(201, {result}, true, "requried feed fetched successfully"))
-} catch (error) {
-  throw new Error(error)
-}
-  
+const getAllVideos = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
 })
 
-export { uploadVideo, deleteVideo, getVideoById , togglePublishStatus , getUserFeed};
+export { uploadVideo, deleteVideo, getVideoById , togglePublishStatus };

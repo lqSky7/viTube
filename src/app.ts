@@ -18,6 +18,7 @@ import  subRouter  from "./routes/subscription.routes";
 import vidRouter  from "./routes/video.routes";
 import tweetRouter from "./routes/tweet.routes";
 import commentRouter from "./routes/comment.routes";
+import likeRouter from "./routes/like.routes";
 
 
 app.use("/api/v1/users", userRouter);
@@ -25,6 +26,6 @@ app.use("/api/v1/subscribe", subRouter);
 app.use("/api/v1/video", vidRouter);
 app.use("/api/v1/tweet", tweetRouter);
 app.use("/api/v1/comment", commentRouter);
-
+app.use("/api/v1/like", likeRouter)
 
 export { app };

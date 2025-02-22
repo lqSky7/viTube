@@ -12,7 +12,7 @@ dotenv.config({ path: "./env" });
 
 const getCurrentUserDetails = asyncHandler(async (req, res) => {
   try {
-    const user = await User.findById(req.user123._id).select(
+    const user = await User.findById(req.authorizedUser._id).select(
       "-refreshToken -password"
     );
 
@@ -31,7 +31,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
       throw new errApi(400, "User data empty", [], "User data empty");
     }
     const user = await User.findByIdAndUpdate(
-      req.user123._id,
+      req.authorizedUser._id,
       { $set: { fullname: fullname, email: email } },
       { new: true }
     ).select("-password -refreshToken");
@@ -57,7 +57,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   try {
     const avt = await uppToCloudinary(avatarLocalpath);
     const user = await User.findByIdAndUpdate(
-      req.user123?._id,
+      req.authorizedUser?._id,
       { $set: { avatar: avt } },
       { new: true }
     ).select("-password -refreshToken");
@@ -142,7 +142,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   // delete all cookies
 
   await User.findByIdAndUpdate(
-    req.user123._id,
+    req.authorizedUser._id,
     {
       $set: { refreshToken: undefined },
     },
@@ -273,12 +273,12 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const updatePassword = asyncHandler(async (req, res) => {
-  // we'll be using auth middleware here, so req.user123 is our user extracted from cookies by that middleware.
+  // we'll be using auth middleware here, so req.authorizedUser is our user extracted from cookies by that middleware.
   const { newPass, oldPass } = req.body;
   // match old pass against user
   // if correct hash and update
 
-  const user = await User.findById(req.user123._id);
+  const user = await User.findById(req.authorizedUser._id);
 
   const passreturn = await user.isPassCrct(oldPass);
   if (!passreturn) {
@@ -326,7 +326,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         subscribedTo: { $size: "$subscribedTo" },
         isSubscribed: {
           $cond: {
-            if: { $in: [req.user123?._id, "$subscribers.subscriber"] },
+            if: { $in: [req.authorizedUser?._id, "$subscribers.subscriber"] },
             then: true,
             else: false,
           },
@@ -359,8 +359,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
-      // $match: {_id: req.user123._id} wrong as req123._id returns a string , it was mongoose that converted that string to object to query db in above cases, but mongoose doesnt do that in aggregate
-      $match: { _id: new mongoose.Types.ObjectId(req.user123._id) },
+      // $match: {_id: req.authorizedUser._id} wrong as req123._id returns a string , it was mongoose that converted that string to object to query db in above cases, but mongoose doesnt do that in aggregate
+      $match: { _id: new mongoose.Types.ObjectId(req.authorizedUser._id) },
     },
     {
       $lookup: {

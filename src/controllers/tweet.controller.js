@@ -5,8 +5,8 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { apiResponse } from "../utils/responseApi";
 
 const createTweet = asyncHandler(async(req, res) => {
-    const owner = req.user123._id;
-    const username = req.user123.username;
+    const owner = req.authorizedUser._id;
+    const username = req.authorizedUser.username;
     const {content} = req.body;
     if(content == undefined){
         throw new errApi(401, "Tweet content not provided")

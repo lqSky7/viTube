@@ -28,7 +28,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
       description,
       videoFile: videoUploadResponse.url,
       duration: videoUploadResponse.duration || 0,
-      owner: req.user123._id,
+      owner: req.authorizedUser._id,
     });
 
     return res
@@ -51,7 +51,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
 
 const deleteVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.body;
-  const owner = req.user123._id;
+  const owner = req.authorizedUser._id;
   if (!videoId) {
     throw new errApi(401, "Video Id not provided", [], "");
   }
@@ -102,7 +102,7 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
   const { videoId } = req.body;
-  const owner = req.user123._id;
+  const owner = req.authorizedUser._id;
   
   if (!videoId) {
     throw new errApi(401, "Video Id not provided", [], "");

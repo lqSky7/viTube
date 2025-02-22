@@ -13,7 +13,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
   if (isSubscribed == 0) {
     try {
-      const subscriber = req.user123._id;
+      const subscriber = req.authorizedUser._id;
       const subs = await Subscription.create({ subscriber, channel });
       return res
         .status(201)
@@ -33,7 +33,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
       );
     }
   } else {
-    const subscriber = req.user123._id;
+    const subscriber = req.authorizedUser._id;
     try {
       const result = await Subscription.findOneAndDelete({
         $and: [{subscriber, channel }],
@@ -83,7 +83,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 });
 
 const getSubscribedChannels = asyncHandler(async (req,res) => {
-  const user = req.user123._id;
+  const user = req.authorizedUser._id;
   try {
     const allSubscribedChannels = await Subscription.find({subscriber: user})
     return res.status(201).json(new apiResponse(201, allSubscribedChannels, true, "successful"))

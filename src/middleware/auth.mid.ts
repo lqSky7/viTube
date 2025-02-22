@@ -43,7 +43,7 @@ export const verifyJWT = asyncHandler(
       req.authorizedUser = user;
       next();
     } catch (error) {
-      throw new errApi(401, "Something went wrong", "error" , "");
+      throw new errApi(401, "User can't be authorized!", "error" , "");
     }
   }
 );
